@@ -954,16 +954,34 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       const data = await res.json();
       if (res.ok) {
-        showToast('Schematic uploaded!');
-        form.reset();
-        loadSchematics();
-      } else {
+  showSchematicUploadSuccess();
+  form.reset();
+  loadSchematics();
+    }else {
         showToast(data.error || 'Upload failed');
       }
     });
   }
   loadSchematics();
 });
+
+function showSchematicUploadSuccess() {
+  const existingModal = document.getElementById('schematicUploadSuccessModal');
+  if (existingModal) existingModal.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'schematicUploadSuccessModal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal-content">
+      <button type="button" class="modal-close" onclick="document.getElementById('schematicUploadSuccessModal').remove()">&times;</button>
+      <h2 class="modal-title">Schematic Submitted!</h2>
+      <p>Your schematic has been submitted for review. If approved, it will be posted to the site for the community to download. Thank you for contributing!</p>
+      <button type="button" class="form-submit-btn" onclick="document.getElementById('schematicUploadSuccessModal').remove()">OK</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
 
 // Load schematics
 async function loadSchematics() {
@@ -1800,3 +1818,132 @@ setTimeout(() => {
     productCategoryFilter.addEventListener('change', loadAdminProducts);
   }
 }, 1000);
+
+function switchAdminTab(tab) {
+  currentAdminTab = tab;
+  document.querySelectorAll('.admin-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.toLowerCase().includes(tab));
+  });
+  document.querySelectorAll('.admin-tab-content').forEach(content => {
+    content.classList.remove('active');
+  });
+  document.getElementById(`${tab}Tab`)?.classList.add('active');
+
+  if (tab === 'products') {
+    loadAdminProducts();
+  } else if (tab === 'logins') {
+    loadLoginLogs();
+  } else if (tab === 'schematics') {
+    loadAdminSchematics();
+  } else {
+    loadAdminOrders();
+  }
+}
+
+async function loadAdminSchematics() {
+  const res = await fetch('/api/schematics');
+  const data = await res.json();
+  const pending = (data.schematics || []).filter(s => !s.approved);
+  const uploaded = (data.schematics || []).filter(s => s.approved);
+
+  const pendingList = document.getElementById('adminSchematicsPending');
+  const uploadedList = document.getElementById('adminSchematicsUploaded');
+  if (pendingList) {
+    pendingList.innerHTML = pending.length === 0
+      ? '<div class="admin-no-orders">No pending schematics</div>'
+      : pending.map(s => `
+        <div class="admin-product-card">
+          <div>
+            <h4>${escapeHtml(s.title)}</h4>
+            <p>${escapeHtml(s.description)}</p>
+            <p>By: ${s.anonymous ? 'Anonymous' : escapeHtml(s.username || 'Unknown')}</p>
+            <button class="admin-add-btn" onclick="approveSchematic('${s.id}')">Approve</button>
+          </div>
+        </div>
+      `).join('');
+  }
+  if (uploadedList) {
+    uploadedList.innerHTML = uploaded.length === 0
+      ? '<div class="admin-no-orders">No uploaded schematics</div>'
+      : uploaded.map(s => `
+        <div class="admin-product-card">
+          <div>
+            <h4>${escapeHtml(s.title)}</h4>
+            <p>${escapeHtml(s.description)}</p>
+            <p>By: ${s.anonymous ? 'Anonymous' : escapeHtml(s.username || 'Unknown')}</p>
+            <a class="admin-view-btn" href="/api/schematics/${s.id}/download" target="_blank">Download</a>
+          </div>
+        </div>
+      `).join('');
+  }
+}
+
+async function approveSchematic(id) {
+  // You need to implement this endpoint in your server.js
+  const res = await fetch(`/api/admin/schematics/${id}/approve`, { method: 'POST' });
+  if (res.ok) {
+    showToast('Schematic approved!');
+    loadAdminSchematics();
+  } else {
+    showToast('Failed to approve schematic');
+  }
+}
+
+function showAdminSchematicModal() {
+  const existingModal = document.getElementById('adminSchematicModal');
+  if (existingModal) existingModal.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'adminSchematicModal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal-content">
+      <button type="button" class="modal-close" onclick="document.getElementById('adminSchematicModal').remove()">&times;</button>
+      <h2 class="modal-title">Post Schematic</h2>
+      <form id="adminSchematicForm">
+        <div class="form-group">
+          <label class="form-label">Title</label>
+          <input type="text" id="adminSchematicTitle" class="form-input" required maxlength="64">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea id="adminSchematicDescription" class="form-input" required minlength="30" maxlength="500"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">.litematica File</label>
+          <input type="file" id="adminSchematicFile" class="form-input" accept=".litematica" required>
+        </div>
+        <button type="submit" class="form-submit-btn">Post</button>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  document.getElementById('adminSchematicForm').onsubmit = async function(e) {
+    e.preventDefault();
+    const file = document.getElementById('adminSchematicFile').files[0];
+    const title = document.getElementById('adminSchematicTitle').value.trim();
+    const description = document.getElementById('adminSchematicDescription').value.trim();
+    if (!file || !file.name.endsWith('.litematica')) {
+      showToast('Only .litematica files are allowed.');
+      return;
+    }
+    if (description.length < 30) {
+      showToast('Description must be at least 30 characters.');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('approved', 'true');
+    const res = await fetch('/api/admin/schematics', { method: 'POST', body: formData });
+    if (res.ok) {
+      showToast('Schematic posted!');
+      document.getElementById('adminSchematicModal').remove();
+      loadAdminSchematics();
+    } else {
+      showToast('Failed to post schematic');
+    }
+  };
+}
