@@ -1,9 +1,12 @@
-const express = require('express');
+﻿const express = require('express');
 const cors = require('cors');
 const fetch = require('node-fetch');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
+
+const multer = require('multer');
+const fs = require('fs');
 
 const app = express();
 
@@ -27,6 +30,18 @@ const supabase = createClient(config.supabaseUrl, config.supabaseKey);
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
+
+const upload = multer({ dest: 'schematics/' });
+   const schematicMetaFile = path.join(__dirname, 'schematics.json');
+
+   // Helper to load/save schematic metadata
+   function loadSchematicMeta() {
+     if (!fs.existsSync(schematicMetaFile)) return [];
+     return JSON.parse(fs.readFileSync(schematicMetaFile, 'utf8'));
+   }
+   function saveSchematicMeta(meta) {
+     fs.writeFileSync(schematicMetaFile, JSON.stringify(meta, null, 2));
+   }
 
 // ============================================
 // HELPER FUNCTIONS
@@ -766,6 +781,48 @@ app.get('/api/admin/stats', authenticateToken, requireAdmin, async (req, res) =>
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// Upload schematic
+app.post('/api/schematics', authenticateToken, upload.single('file'), (req, res) => {
+  const { title, description, anonymous } = req.body;
+  if (!req.file || !req.file.originalname.endsWith('.litematica')) {
+    return res.status(400).json({ error: 'Only .litematica files allowed.' });
+  }
+  if (!title || !description || description.length < 30) {
+    return res.status(400).json({ error: 'Title and thoughtful description required.' });
+  }
+  const meta = loadSchematicMeta();
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const entry = {
+    id,
+    title,
+    description,
+    filename: req.file.filename,
+    originalname: req.file.originalname,
+    username: req.user.username,
+    userId: req.user.id,
+    anonymous: anonymous === 'true',
+    createdAt: new Date().toISOString()
+  };
+  meta.push(entry);
+  saveSchematicMeta(meta);
+  res.json({ success: true, schematic: entry });
+});
+
+// List schematics
+app.get('/api/schematics', (req, res) => {
+  const meta = loadSchematicMeta();
+  res.json({ schematics: meta });
+});
+
+// Download schematic (auth required)
+app.get('/api/schematics/:id/download', authenticateToken, (req, res) => {
+  const meta = loadSchematicMeta();
+  const schematic = meta.find(s => s.id === req.params.id);
+     if (!schematic) return res.status(404).json({ error: 'Not found' });
+     const filePath = path.join(__dirname, 'schematics', schematic.filename);
+     res.download(filePath, schematic.originalname);
+   });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

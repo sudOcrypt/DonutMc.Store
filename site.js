@@ -907,6 +907,82 @@ function renderProducts() {
     container.innerHTML = '<div class="admin-loading">Loading products...</div>';
     return;
   }
+
+  // Handle schematic upload
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('schematicUploadForm');
+  if (form) {
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      if (!isLoggedIn()) {
+        showToast('Please login to upload schematics.');
+        showLogin();
+        return;
+      }
+      const file = document.getElementById('schematicFile').files[0];
+      if (!file || !file.name.endsWith('.litematica')) {
+        showToast('Only .litematica files are allowed.');
+        return;
+      }
+      const title = document.getElementById('schematicTitle').value.trim();
+      const description = document.getElementById('schematicDescription').value.trim();
+      if (description.length < 30) {
+        showToast('Description must be at least 30 characters.');
+        return;
+      }
+      const anonymous = document.getElementById('schematicAnonymous').checked;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('title', title);
+      formData.append('description', description);
+      formData.append('anonymous', anonymous);
+
+      const token = getAuthToken();
+      const res = await fetch('/api/schematics', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast('Schematic uploaded!');
+        form.reset();
+        loadSchematics();
+      } else {
+        showToast(data.error || 'Upload failed');
+      }
+    });
+  }
+  loadSchematics();
+});
+
+// Load schematics
+async function loadSchematics() {
+  const res = await fetch('/api/schematics');
+  const data = await res.json();
+  const list = document.getElementById('schematicsList');
+  if (!list) return;
+  if (!data.schematics || data.schematics.length === 0) {
+    list.innerHTML = '<div class="admin-loading">No schematics yet.</div>';
+    return;
+  }
+  const loggedIn = isLoggedIn();
+  list.innerHTML = data.schematics.map(s => `
+    <div class="product-card" style="position:relative;">
+      <div>
+        <h3>${escapeHtml(s.title)}</h3>
+        <p>${escapeHtml(s.description)}</p>
+        <p>By: ${s.anonymous ? 'Anonymous' : escapeHtml(s.username || 'Unknown')}</p>
+        <button type="button" class="add-to-cart-btn" onclick="${loggedIn ? `window.open('/api/schematics/${s.id}/download','_blank')` : 'showLogin()'}">
+          ${loggedIn ? 'Download' : 'Login to Download'}
+        </button>
+        ${!loggedIn ? `<div style="position:absolute;top:0;left:0;width:100%;height:100%;backdrop-filter:blur(4px);background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:2;">
+          <button class="add-to-cart-btn" onclick="showLogin()">Login to Download</button>
+        </div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
   
   const selectedCategoryName = categories[selectedCategory]?.name || 'Money';
   const filteredProducts = products.filter(product => product.category === selectedCategoryName);
@@ -957,14 +1033,17 @@ function renderProducts() {
             </svg>
           </button>
         </div>
-        <button type="button" class="add-to-cart-btn" onclick="addProductToCart(${product.id})" ${!product.inStock ? 'disabled' : ''}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="8" cy="21" r="1"></circle>
-            <circle cx="19" cy="21" r="1"></circle>
-            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
-          </svg>
-          Add to Cart
-        </button>
+${isLoggedIn() ? `
+  <button type="button" class="add-to-cart-btn" onclick="addProductToCart(${product.id})" ${!product.inStock ? 'disabled' : ''}>
+    <svg width="20" height="20" ...></svg>
+    Add to Cart
+  </button>
+` : `
+  <button type="button" class="add-to-cart-btn" onclick="showLogin()" style="filter: blur(0);">
+    <svg width="20" height="20" ...></svg>
+    Login to Purchase
+  </button>
+`}
       </div>
     </div>
   `).join('');
