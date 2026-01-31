@@ -464,6 +464,52 @@ document.addEventListener('DOMContentLoaded', async function() {
   loadUserFromToken();
   loadCart();
 
+    // Schematic upload form event binding
+  const schematicForm = document.getElementById('schematicUploadForm');
+  if (schematicForm) {
+    schematicForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      if (!isLoggedIn()) {
+        showToast('Please login to upload schematics.');
+        showLogin();
+        return;
+      }
+      const file = document.getElementById('schematicFile').files[0];
+      if (!file || !file.name.endsWith('.litematica')) {
+        showToast('Only .litematica files are allowed.');
+        return;
+      }
+      const title = document.getElementById('schematicTitle').value.trim();
+      const description = document.getElementById('schematicDescription').value.trim();
+      if (description.length < 30) {
+        showToast('Description must be at least 30 characters.');
+        return;
+      }
+      const anonymous = document.getElementById('schematicAnonymous').checked;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('title', title);
+      formData.append('description', description);
+      formData.append('anonymous', anonymous);
+
+      const token = getAuthToken();
+      const res = await fetch('/api/schematics', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showSchematicUploadSuccess();
+        schematicForm.reset();
+        loadSchematics();
+      } else {
+        showToast(data.error || 'Upload failed');
+      }
+    });
+  }
+  loadSchematics();
+
   document.getElementById('schematicFile')?.addEventListener('change', function(e) {
   const label = document.getElementById('schematicFileLabel');
   if (label && this.files.length > 0) {
@@ -490,50 +536,29 @@ document.addEventListener('DOMContentLoaded', async function() {
 // ============================================
 
 function showPage(pageName) {
-  const pages = document.querySelectorAll('.page');
-  const targetPage = document.getElementById(`${pageName}-page`);
-  
-  pages.forEach(page => {
-    if (page.classList.contains('active')) {
-      page.classList.add('fade-out');
-      setTimeout(() => {
-        page.classList.remove('active', 'fade-out');
-      }, 300);
-    }
+  // Hide all main pages
+  document.querySelectorAll('.page').forEach(page => {
+    page.classList.remove('active', 'fade-in', 'fade-out');
   });
-  
-  setTimeout(() => {
-    if (targetPage) {
-      targetPage.classList.add('active', 'fade-in');
-      setTimeout(() => {
-        targetPage.classList.remove('fade-in');
-      }, 300);
-      
-      if (pageName === 'cart') {
-        renderCartPage();
-      }
-      
-      // Load admin data when switching to admin page
-      if (pageName === 'admin' && isAdmin()) {
-        loadAdminStats();
-        loadAdminOrders();
-        
-        const searchInput = document.getElementById('adminSearch');
-        const statusFilter = document.getElementById('adminStatusFilter');
-        
-        if (searchInput) {
-          searchInput.removeEventListener('input', debounceSearch);
-          searchInput.addEventListener('input', debounceSearch);
-        }
-        
-        if (statusFilter) {
-          statusFilter.removeEventListener('change', loadAdminOrders);
-          statusFilter.addEventListener('change', loadAdminOrders);
-        }
-      }
+
+  // Hide all admin tab contents
+  document.querySelectorAll('.admin-tab-content').forEach(tab => tab.classList.remove('active'));
+
+  // Show the requested page
+  const targetPage = document.getElementById(`${pageName}-page`);
+  if (targetPage) {
+    targetPage.classList.add('active', 'fade-in');
+    setTimeout(() => targetPage.classList.remove('fade-in'), 300);
+
+    // If admin page, show the default admin tab
+    if (pageName === 'admin' && isAdmin()) {
+      // Show the default admin tab (orders) or last active tab if you track it
+      document.getElementById('ordersTab').classList.add('active');
+      loadAdminStats();
+      loadAdminOrders();
     }
-  }, 300);
-  
+  }
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -917,47 +942,7 @@ function renderProducts() {
     return;
   }
 
-  // Handle schematic upload
-document.addEventListener('DOMContentLoaded', function() {
-  const form = document.getElementById('schematicUploadForm');
-  if (form) {
-    form.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      if (!isLoggedIn()) {
-        showToast('Please login to upload schematics.');
-        showLogin();
-        return;
-      }
-      const file = document.getElementById('schematicFile').files[0];
-      if (!file || !file.name.endsWith('.litematica')) {
-        showToast('Only .litematica files are allowed.');
-        return;
-      }
-      const title = document.getElementById('schematicTitle').value.trim();
-      const description = document.getElementById('schematicDescription').value.trim();
-      if (description.length < 30) {
-        showToast('Description must be at least 30 characters.');
-        return;
-      }
-      const anonymous = document.getElementById('schematicAnonymous').checked;
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('title', title);
-      formData.append('description', description);
-      formData.append('anonymous', anonymous);
-
-      const token = getAuthToken();
-      const res = await fetch('/api/schematics', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formData
-      });
-      const data = await res.json();
-      if (res.ok) {
-  showSchematicUploadSuccess();
-  form.reset();
-  loadSchematics();
-    }else {
+else {
         showToast(data.error || 'Upload failed');
       }
     });
