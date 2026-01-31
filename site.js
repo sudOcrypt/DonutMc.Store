@@ -945,6 +945,16 @@ function renderProducts() {
   const selectedCategoryName = categories[selectedCategory]?.name || 'Money';
   const filteredProducts = products.filter(product => product.category === selectedCategoryName);
 
+  if (filteredProducts.length === 0) {
+    container.innerHTML = `
+      <div class="no-products">
+        <div class="no-products-icon">${categories[selectedCategory]?.icon || '📦'}</div>
+        <h3 class="no-products-title">Coming Soon!</h3>
+        <p class="no-products-text">We're working on adding ${escapeHtml(selectedCategoryName.toLowerCase())} to our store. Check back soon!</p>
+      </div>
+    `;
+    return;
+  }
 
 
 
