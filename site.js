@@ -942,10 +942,10 @@ function renderProducts() {
     return;
   }
 
-else {
-        showToast(data.error || 'Upload failed');
-      }
-    });
+  const selectedCategoryName = categories[selectedCategory]?.name || 'Money';
+  const filteredProducts = products.filter(product => product.category === selectedCategoryName);
+
+
   }
   loadSchematics();
 });
