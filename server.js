@@ -851,3 +851,41 @@ app.get('/api/admin/login-logs', authenticateToken, requireAdmin, async (req, re
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// Approve schematic
+app.post('/api/admin/schematics/:id/approve', authenticateToken, requireAdmin, (req, res) => {
+  const meta = loadSchematicMeta();
+  const schematic = meta.find(s => s.id === req.params.id);
+  if (!schematic) return res.status(404).json({ error: 'Not found' });
+  schematic.approved = true;
+  saveSchematicMeta(meta);
+  res.json({ success: true });
+});
+
+// Admin post schematic (auto-approved)
+app.post('/api/admin/schematics', authenticateToken, requireAdmin, upload.single('file'), (req, res) => {
+  const { title, description } = req.body;
+  if (!req.file || !req.file.originalname.endsWith('.litematica')) {
+    return res.status(400).json({ error: 'Only .litematica files allowed.' });
+  }
+  if (!title || !description || description.length < 30) {
+    return res.status(400).json({ error: 'Title and thoughtful description required.' });
+  }
+  const meta = loadSchematicMeta();
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const entry = {
+    id,
+    title,
+    description,
+    filename: req.file.filename,
+    originalname: req.file.originalname,
+    username: req.user.username,
+    userId: req.user.id,
+    anonymous: false,
+    approved: true,
+    createdAt: new Date().toISOString()
+  };
+  meta.push(entry);
+  saveSchematicMeta(meta);
+  res.json({ success: true, schematic: entry });
+});
