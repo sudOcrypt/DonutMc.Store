@@ -936,7 +936,7 @@ function selectCategory(index) {
 function renderProducts() {
   const container = document.getElementById('productsContainer');
   if (!container) return;
-  
+
   if (categories.length === 0) {
     container.innerHTML = '<div class="admin-loading">Loading products...</div>';
     return;
@@ -1375,49 +1375,29 @@ async function updateOrderStatus(orderId, newStatus) {
 let currentAdminTab = 'orders';
 let adminProducts = [];
 
-function switchAdminTab(tab) {
-  currentAdminTab = tab;
-
-  document.querySelectorAll('.admin-tab').forEach(btn => {
-    btn.classList.toggle('active', btn.textContent.toLowerCase().includes(tab));
-  });
-
-  document.querySelectorAll('.admin-tab-content').forEach(content => {
-    content.classList.remove('active');
-  });
-  document.getElementById(`${tab}Tab`)?.classList.add('active');
-
-  if (tab === 'products') {
-    loadAdminProducts();
-  } else if (tab === 'logins') {
-    loadLoginLogs();
-  } else {
-    loadAdminOrders();
-  }
-}
 
 async function loadAdminProducts() {
   const token = getAuthToken();
   if (!token || !isAdmin()) return;
-  
+
   const container = document.getElementById('adminProducts');
   if (!container) return;
-  
+
   container.innerHTML = '<div class="admin-loading">Loading products...</div>';
-  
+
   try {
     const response = await fetch('/api/admin/products', {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    
+
     if (!response.ok) throw new Error('Failed to fetch products');
-    
+
     const data = await response.json();
     adminProducts = data.products;
-    
+
     const searchTerm = document.getElementById('productSearch')?.value.toLowerCase() || '';
     const categoryFilter = document.getElementById('productCategoryFilter')?.value || 'all';
-    
+
     let filtered = adminProducts;
     if (searchTerm) {
       filtered = filtered.filter(p => p.title.toLowerCase().includes(searchTerm));
@@ -1425,20 +1405,20 @@ async function loadAdminProducts() {
     if (categoryFilter !== 'all') {
       filtered = filtered.filter(p => p.category === categoryFilter);
     }
-    
+
     if (filtered.length === 0) {
       container.innerHTML = '<div class="admin-no-orders">No products found</div>';
       return;
     }
-    
+
     container.innerHTML = filtered.map(product => {
       const stockStatus = product.stock === 0 ? 'out-of-stock' : product.stock <= 10 ? 'low-stock' : 'in-stock';
       const stockLabel = product.stock === 0 ? 'Out of Stock' : product.stock <= 10 ? 'Low Stock' : 'In Stock';
-      
+
       return `
         <div class="admin-product-card" data-id="${product.id}">
           <div class="admin-product-image">
-            ${product.image_url ? `<img src="${product.image_url}" alt="${escapeHtml(product.title)}">` : '📦'}
+            ${product.imageUrl ? `<img src="${product.imageUrl}" alt="${escapeHtml(product.title)}">` : '📦'}
           </div>
           <div class="admin-product-info">
             <div class="admin-product-title">${escapeHtml(product.title)}</div>
@@ -1457,7 +1437,7 @@ async function loadAdminProducts() {
         </div>
       `;
     }).join('');
-    
+
   } catch (error) {
     console.error('Error loading admin products:', error);
     container.innerHTML = '<div class="admin-no-orders">Failed to load products</div>';
@@ -1562,9 +1542,9 @@ function showEditProductModal(productId) {
 function showProductModal(product) {
   const existingModal = document.getElementById('productModal');
   if (existingModal) existingModal.remove();
-  
+
   const isEdit = product !== null;
-  
+
   const modal = document.createElement('div');
   modal.id = 'productModal';
   modal.className = 'modal-overlay';
@@ -1598,7 +1578,7 @@ function showProductModal(product) {
           <div class="form-group">
             <label class="form-label">Old Price ($)</label>
             <input type="number" class="form-input" id="productOldPrice" placeholder="Optional" step="0.01" min="0" 
-                   value="${product?.old_price || ''}">
+                   value="${product?.oldPrice || ''}">
           </div>
         </div>
         
@@ -1618,7 +1598,7 @@ function showProductModal(product) {
         <div class="form-group">
           <label class="form-label">Image URL</label>
           <input type="text" class="form-input" id="productImageUrl" placeholder="e.g., assets/item.png" 
-                 value="${product?.image_url || ''}">
+                 value="${product?.imageUrl || ''}">
           <span class="form-hint">Local path (assets/...) or full URL</span>
         </div>
         
@@ -1634,7 +1614,7 @@ function showProductModal(product) {
       </form>
     </div>
   `;
-  
+
   document.body.appendChild(modal);
 }
 
@@ -1648,16 +1628,16 @@ function closeProductModal() {
 
 async function submitProductForm(event, productId) {
   event.preventDefault();
-  
+
   const token = getAuthToken();
   if (!token || !isAdmin()) return;
-  
+
   const submitBtn = document.getElementById('productSubmitBtn');
   if (submitBtn) {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Saving...';
   }
-  
+
   const productData = {
     category: document.getElementById('productCategory').value,
     title: document.getElementById('productTitle').value,
@@ -1668,11 +1648,11 @@ async function submitProductForm(event, productId) {
     imageUrl: document.getElementById('productImageUrl').value || null,
     description: document.getElementById('productDescription').value || 'Instant delivery'
   };
-  
+
   try {
     const url = productId ? `/api/admin/products/${productId}` : '/api/admin/products';
     const method = productId ? 'PUT' : 'POST';
-    
+
     const response = await fetch(url, {
       method,
       headers: {
@@ -1681,23 +1661,23 @@ async function submitProductForm(event, productId) {
       },
       body: JSON.stringify(productData)
     });
-    
+
     if (!response.ok) {
       const data = await response.json();
       throw new Error(data.error || 'Failed to save product');
     }
-    
+
     showToast(productId ? 'Product updated!' : 'Product created!');
     closeProductModal();
     loadAdminProducts();
     loadProducts();
     loadCategories();
     loadAdminStats();
-    
+
   } catch (error) {
     console.error('Error saving product:', error);
     showToast(error.message || 'Failed to save product');
-    
+
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.textContent = productId ? 'Save Changes' : 'Add Product';
