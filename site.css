@@ -3256,6 +3256,10 @@ a:focus-visible {
     flex-direction: column;
     gap: 0.5rem;
 }
+/* Add spacing below the last form-group before the submit button */
+#schematicUploadForm .form-group:last-of-type {
+    margin-bottom: 1.5rem;
+}
 
 .form-label {
     color: white;
