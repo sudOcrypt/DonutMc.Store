@@ -956,68 +956,6 @@ function renderProducts() {
     return;
   }
 
-
-
-function showSchematicUploadSuccess() {
-  const existingModal = document.getElementById('schematicUploadSuccessModal');
-  if (existingModal) existingModal.remove();
-
-  const modal = document.createElement('div');
-  modal.id = 'schematicUploadSuccessModal';
-  modal.className = 'modal-overlay';
-  modal.innerHTML = `
-    <div class="modal-content">
-      <button type="button" class="modal-close" onclick="document.getElementById('schematicUploadSuccessModal').remove()">&times;</button>
-      <h2 class="modal-title">Schematic Submitted!</h2>
-      <p>Your schematic has been submitted for review. If approved, it will be posted to the site for the community to download. Thank you for contributing!</p>
-      <button type="button" class="form-submit-btn" onclick="document.getElementById('schematicUploadSuccessModal').remove()">OK</button>
-    </div>
-  `;
-  document.body.appendChild(modal);
-}
-
-// Load schematics
-async function loadSchematics() {
-  const res = await fetch('/api/schematics');
-  const data = await res.json();
-  const list = document.getElementById('schematicsList');
-  if (!list) return;
-  if (!data.schematics || data.schematics.length === 0) {
-    list.innerHTML = '<div class="admin-loading">No schematics yet.</div>';
-    return;
-  }
-  const loggedIn = isLoggedIn();
-  list.innerHTML = data.schematics.map(s => `
-    <div class="product-card" style="position:relative;">
-      <div>
-        <h3>${escapeHtml(s.title)}</h3>
-        <p>${escapeHtml(s.description)}</p>
-        <p>By: ${s.anonymous ? 'Anonymous' : escapeHtml(s.username || 'Unknown')}</p>
-        <button type="button" class="add-to-cart-btn" onclick="${loggedIn ? `window.open('/api/schematics/${s.id}/download','_blank')` : 'showLogin()'}">
-          ${loggedIn ? 'Download' : 'Login to Download'}
-        </button>
-        ${!loggedIn ? `<div style="position:absolute;top:0;left:0;width:100%;height:100%;backdrop-filter:blur(4px);background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:2;">
-          <button class="add-to-cart-btn" onclick="showLogin()">Login to Download</button>
-        </div>` : ''}
-      </div>
-    </div>
-  `).join('');
-}
-  
-  const selectedCategoryName = categories[selectedCategory]?.name || 'Money';
-  const filteredProducts = products.filter(product => product.category === selectedCategoryName);
-  
-  if (filteredProducts.length === 0) {
-    container.innerHTML = `
-      <div class="no-products">
-        <div class="no-products-icon">${categories[selectedCategory]?.icon || '📦'}</div>
-        <h3 class="no-products-title">Coming Soon!</h3>
-        <p class="no-products-text">We're working on adding ${escapeHtml(selectedCategoryName.toLowerCase())} to our store. Check back soon!</p>
-      </div>
-    `;
-    return;
-  }
-  
   container.innerHTML = filteredProducts.map(product => `
     <div class="product-card" data-product-id="${product.id}">
       <div class="product-card-content">
@@ -1939,4 +1877,58 @@ function showAdminSchematicModal() {
       showToast('Failed to post schematic');
     }
   };
+}
+
+// ============================================
+// Schematic helpers (moved outside renderProducts to avoid duplicate declarations)
+// ============================================
+
+function showSchematicUploadSuccess() {
+  const existingModal = document.getElementById('schematicUploadSuccessModal');
+  if (existingModal) existingModal.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'schematicUploadSuccessModal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal-content">
+      <button type="button" class="modal-close" onclick="document.getElementById('schematicUploadSuccessModal').remove()">&times;</button>
+      <h2 class="modal-title">Schematic Submitted!</h2>
+      <p>Your schematic has been submitted for review. If approved, it will be posted to the site for the community to download. Thank you for contributing!</p>
+      <button type="button" class="form-submit-btn" onclick="document.getElementById('schematicUploadSuccessModal').remove()">OK</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+// Load schematics
+async function loadSchematics() {
+  try {
+    const res = await fetch('/api/schematics');
+    const data = await res.json();
+    const list = document.getElementById('schematicsList');
+    if (!list) return;
+    if (!data.schematics || data.schematics.length === 0) {
+      list.innerHTML = '<div class="admin-loading">No schematics yet.</div>';
+      return;
+    }
+    const loggedIn = isLoggedIn();
+    list.innerHTML = data.schematics.map(s => `
+      <div class="product-card" style="position:relative;">
+        <div>
+          <h3>${escapeHtml(s.title)}</h3>
+          <p>${escapeHtml(s.description)}</p>
+          <p>By: ${s.anonymous ? 'Anonymous' : escapeHtml(s.username || 'Unknown')}</p>
+          <button type="button" class="add-to-cart-btn" onclick="${loggedIn ? `window.open('/api/schematics/${s.id}/download','_blank')` : 'showLogin()'}">
+            ${loggedIn ? 'Download' : 'Login to Download'}
+          </button>
+          ${!loggedIn ? `<div style="position:absolute;top:0;left:0;width:100%;height:100%;backdrop-filter:blur(4px);background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:2;">
+            <button class="add-to-cart-btn" onclick="showLogin()">Login to Download</button>
+          </div>` : ''}
+        </div>
+      </div>
+    `).join('');
+  } catch (err) {
+    console.error('Failed to load schematics:', err);
+  }
 }
