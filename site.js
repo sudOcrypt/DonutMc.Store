@@ -198,6 +198,7 @@ function updateAuthUI() {
   }
 }
 
+
 // ============================================
 // ORDER HISTORY
 // ============================================
@@ -1339,18 +1340,20 @@ let adminProducts = [];
 
 function switchAdminTab(tab) {
   currentAdminTab = tab;
-  
+
   document.querySelectorAll('.admin-tab').forEach(btn => {
-    btn.classList.toggle('active', btn.textContent.toLowerCase() === tab);
+    btn.classList.toggle('active', btn.textContent.toLowerCase().includes(tab));
   });
-  
+
   document.querySelectorAll('.admin-tab-content').forEach(content => {
     content.classList.remove('active');
   });
   document.getElementById(`${tab}Tab`)?.classList.add('active');
-  
+
   if (tab === 'products') {
     loadAdminProducts();
+  } else if (tab === 'logins') {
+    loadLoginLogs();
   } else {
     loadAdminOrders();
   }
@@ -1421,6 +1424,64 @@ async function loadAdminProducts() {
   } catch (error) {
     console.error('Error loading admin products:', error);
     container.innerHTML = '<div class="admin-no-orders">Failed to load products</div>';
+  }
+}
+async function loadLoginLogs() {
+  const token = getAuthToken();
+  if (!token || !isAdmin()) return;
+
+  const container = document.getElementById('adminLoginLogs');
+  if (!container) return;
+
+  container.innerHTML = '<div class="admin-loading">Loading login logs...</div>';
+
+  try {
+    const response = await fetch('/api/admin/login-logs', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch login logs');
+
+    const { logs } = await response.json();
+
+    if (!logs || logs.length === 0) {
+      container.innerHTML = '<div class="admin-no-orders">No login logs found</div>';
+      return;
+    }
+
+    container.innerHTML = `
+      <table class="login-log-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>User</th>
+            <th>Discord ID</th>
+            <th>Email</th>
+            <th>Admin?</th>
+            <th>IP</th>
+            <th>User Agent</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${logs.map(log => `
+            <tr>
+              <td>${formatDate(log.created_at)}</td>
+              <td>
+                ${escapeHtml(log.global_name || log.username)}#${escapeHtml(log.discriminator)}
+              </td>
+              <td>${escapeHtml(log.user_id)}</td>
+              <td>${escapeHtml(log.email || '')}</td>
+              <td>${log.is_admin ? '✅' : ''}</td>
+              <td>${escapeHtml(log.ip_address || '')}</td>
+              <td style="max-width:200px;overflow-x:auto;">${escapeHtml(log.user_agent || '')}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch (error) {
+    console.error('Error loading login logs:', error);
+    container.innerHTML = '<div class="admin-no-orders">Failed to load login logs</div>';
   }
 }
 
