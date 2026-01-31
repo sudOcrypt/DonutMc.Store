@@ -946,9 +946,7 @@ function renderProducts() {
   const filteredProducts = products.filter(product => product.category === selectedCategoryName);
 
 
-  }
-  loadSchematics();
-});
+
 
 function showSchematicUploadSuccess() {
   const existingModal = document.getElementById('schematicUploadSuccessModal');
