@@ -475,8 +475,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
       }
       const file = document.getElementById('schematicFile').files[0];
-      if (!file || !file.name.endsWith('.litematica')) {
-        showToast('Only .litematica files are allowed.');
+      if (!file || !file.name.endsWith('.litematic')) {
+        showToast('Only .litematic files are allowed.');
         return;
       }
       const title = document.getElementById('schematicTitle').value.trim();
@@ -1821,8 +1821,8 @@ function showAdminSchematicModal() {
           <textarea id="adminSchematicDescription" class="form-input" required minlength="30" maxlength="500"></textarea>
         </div>
         <div class="form-group">
-          <label class="form-label">.litematica File</label>
-          <input type="file" id="adminSchematicFile" class="form-input" accept=".litematica" required>
+          <label class="form-label">.litematic File</label>
+          <input type="file" id="adminSchematicFile" class="form-input" accept=".litematic" required>
         </div>
         <button type="submit" class="form-submit-btn">Post</button>
       </form>
@@ -1835,8 +1835,8 @@ function showAdminSchematicModal() {
     const file = document.getElementById('adminSchematicFile').files[0];
     const title = document.getElementById('adminSchematicTitle').value.trim();
     const description = document.getElementById('adminSchematicDescription').value.trim();
-    if (!file || !file.name.endsWith('.litematica')) {
-      showToast('Only .litematica files are allowed.');
+    if (!file || !file.name.endsWith('.litematic')) {
+      showToast('Only .litematic files are allowed.');
       return;
     }
     if (description.length < 30) {
