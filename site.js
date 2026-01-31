@@ -463,6 +463,15 @@ document.addEventListener('DOMContentLoaded', async function() {
   handleAuthCallback();
   loadUserFromToken();
   loadCart();
+
+  document.getElementById('schematicFile')?.addEventListener('change', function(e) {
+  const label = document.getElementById('schematicFileLabel');
+  if (label && this.files.length > 0) {
+    label.textContent = this.files[0].name;
+  } else if (label) {
+    label.textContent = 'Choose file...';
+  }
+});
   
   // Load dynamic data from API
   await Promise.all([loadCategories(), loadProducts()]);
