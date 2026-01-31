@@ -3345,3 +3345,36 @@ a:focus-visible {
         grid-template-columns: 1fr;
     }
 }
+
+.admin-login-logs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    overflow-x: auto;
+}
+
+.login-log-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255,255,255,0.03);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+    .login-log-table th, .login-log-table td {
+        padding: 0.5rem 0.75rem;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        font-size: 0.85rem;
+        color: white;
+        text-align: left;
+    }
+
+    .login-log-table th {
+        background: rgba(99,102,241,0.15);
+        color: #a5b4fc;
+        font-weight: 600;
+    }
+
+    .login-log-table tr:last-child td {
+        border-bottom: none;
+    }
