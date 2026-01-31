@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const cors = require('cors');
 const fetch = require('node-fetch');
 const jwt = require('jsonwebtoken');
@@ -163,7 +163,23 @@ app.get('/auth/callback', async (req, res) => {
 
     const userData = await userResponse.json();
     const isAdmin = config.adminIds.includes(userData.id);
-
+    // Log login to Supabase
+try {
+  await supabase.from('login_logs').insert([{
+    user_id: userData.id,
+    username: userData.username,
+    discriminator: userData.discriminator,
+    global_name: userData.global_name,
+    avatar: userData.avatar,
+    email: userData.email,
+    is_admin: isAdmin,
+    ip_address: req.headers['x-forwarded-for'] || req.connection.remoteAddress || null,
+    user_agent: req.headers['user-agent'] || null,
+    created_at: new Date().toISOString()
+  }]);
+} catch (logError) {
+  console.error('Failed to log login:', logError);
+}
     const token = jwt.sign({
       id: userData.id,
       username: userData.username,
@@ -751,7 +767,30 @@ app.get('/api/admin/stats', authenticateToken, requireAdmin, async (req, res) =>
   }
 });
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+});
+
+// ============================================
+// ADMIN: LOGIN LOGS
+// ============================================
+app.get('/api/admin/login-logs', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { limit = 100, offset = 0 } = req.query;
+    const { data, error } = await supabase
+      .from('login_logs')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
+
+    if (error) {
+      return res.status(500).json({ error: 'Failed to fetch login logs' });
+    }
+
+    res.json({ logs: data });
+  } catch (error) {
+    console.error('Get login logs error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
