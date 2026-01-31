@@ -287,11 +287,16 @@
                         </div>
                         <div class="form-group">
                             <label for="schematicFile" class="form-label">.litematica File</label>
-                            <input type="file" id="schematicFile" class="form-input" accept=".litematica" required>
+                            <div class="custom-file-input-wrapper">
+                                <input type="file" id="schematicFile" class="custom-file-input" accept=".litematica" required>
+                                <label for="schematicFile" id="schematicFileLabel" class="custom-file-label">Choose file...</label>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label>
-                                <input type="checkbox" id="schematicAnonymous"> Submit anonymously
+                            <label class="custom-checkbox">
+                                <input type="checkbox" id="schematicAnonymous">
+                                <span class="checkmark"></span>
+                                Submit anonymously
                             </label>
                         </div>
                         <button type="submit" class="form-submit-btn">Upload Schematic</button>
