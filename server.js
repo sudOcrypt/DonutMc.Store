@@ -785,8 +785,8 @@ app.get('/api/admin/stats', authenticateToken, requireAdmin, async (req, res) =>
 // Upload schematic
 app.post('/api/schematics', authenticateToken, upload.single('file'), (req, res) => {
   const { title, description, anonymous } = req.body;
-  if (!req.file || !req.file.originalname.endsWith('.litematica')) {
-    return res.status(400).json({ error: 'Only .litematica files allowed.' });
+  if (!req.file || !req.file.originalname.endsWith('.litematic')) {
+    return res.status(400).json({ error: 'Only .litematic files allowed.' });
   }
   if (!title || !description || description.length < 30) {
     return res.status(400).json({ error: 'Title and thoughtful description required.' });
@@ -865,8 +865,8 @@ app.post('/api/admin/schematics/:id/approve', authenticateToken, requireAdmin, (
 // Admin post schematic (auto-approved)
 app.post('/api/admin/schematics', authenticateToken, requireAdmin, upload.single('file'), (req, res) => {
   const { title, description } = req.body;
-  if (!req.file || !req.file.originalname.endsWith('.litematica')) {
-    return res.status(400).json({ error: 'Only .litematica files allowed.' });
+  if (!req.file || !req.file.originalname.endsWith('.litematic')) {
+    return res.status(400).json({ error: 'Only .litematic files allowed.' });
   }
   if (!title || !description || description.length < 30) {
     return res.status(400).json({ error: 'Title and thoughtful description required.' });
