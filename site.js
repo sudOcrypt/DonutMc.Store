@@ -959,7 +959,9 @@ function renderProducts() {
   container.innerHTML = filteredProducts.map(product => `
     <div class="product-card" data-product-id="${product.id}">
       <div class="product-card-content">
-        <div class="product-emoji">${product.emoji}</div>
+        <div class="product-emoji">
+  ${product.imageUrl ? `<img src="${product.imageUrl}" alt="${escapeHtml(product.title)}" class="product-image">` : product.emoji}
+</div>
         <div class="product-info">
           <div class="product-header">
             <h3 class="product-title">${escapeHtml(product.title)}</h3>
@@ -1733,7 +1735,8 @@ setTimeout(() => {
 function switchAdminTab(tab) {
   currentAdminTab = tab;
   document.querySelectorAll('.admin-tab').forEach(btn => {
-    btn.classList.toggle('active', btn.textContent.toLowerCase().includes(tab));
+    // Use the tab name to match the button's onclick attribute
+    btn.classList.toggle('active', btn.getAttribute('onclick')?.includes(tab));
   });
   document.querySelectorAll('.admin-tab-content').forEach(content => {
     content.classList.remove('active');
@@ -1790,8 +1793,11 @@ async function loadAdminSchematics() {
 }
 
 async function approveSchematic(id) {
-  // You need to implement this endpoint in your server.js
-  const res = await fetch(`/api/admin/schematics/${id}/approve`, { method: 'POST' });
+  const token = getAuthToken();
+  const res = await fetch(`/api/admin/schematics/${id}/approve`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
   if (res.ok) {
     showToast('Schematic approved!');
     loadAdminSchematics();
@@ -1893,7 +1899,13 @@ async function loadSchematics() {
       return;
     }
     const loggedIn = isLoggedIn();
-    list.innerHTML = data.schematics.map(s => `
+    // Only show approved schematics
+    const approvedSchematics = data.schematics.filter(s => s.approved);
+    if (approvedSchematics.length === 0) {
+      list.innerHTML = '<div class="admin-loading">No schematics yet.</div>';
+      return;
+    }
+    list.innerHTML = approvedSchematics.map(s => `
       <div class="product-card" style="position:relative;">
         <div>
           <h3>${escapeHtml(s.title)}</h3>
