@@ -494,58 +494,54 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
   }
   const schematicForm = document.getElementById('schematicUploadForm');
-  if (schematicForm) {
-    schematicForm.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      if (!isLoggedIn()) {
-        showToast('Please login to upload schematics.');
-        showLogin();
-        return;
-      }
-      const file = document.getElementById('schematicFile').files[0];
-      if (!file || !file.name.endsWith('.litematic')) {
-        showToast('Only .litematic files are allowed.');
-        return;
-      }
-      const title = document.getElementById('schematicTitle').value.trim();
-      const description = document.getElementById('schematicDescription').value.trim();
-      if (description.length < 30) {
-        showToast('Description must be at least 30 characters.');
-        return;
-      }
-      const anonymous = document.getElementById('schematicAnonymous').checked;
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('title', title);
-      formData.append('description', description);
-      formData.append('anonymous', anonymous);
+if (schematicForm) {
+  schematicForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if (!isLoggedIn()) {
+      showToast('Please login to upload schematics.');
+      showLogin();
+      return;
+    }
+    const file = document.getElementById('schematicFile').files[0];
+    const image = document.getElementById('schematicImage').files[0];
+    if (!file || !file.name.endsWith('.litematic')) {
+      showToast('Only .litematic files are allowed.');
+      return;
+    }
+    if (!image) {
+      showToast('Image is required.');
+      return;
+    }
+    const title = document.getElementById('schematicTitle').value.trim();
+    const description = document.getElementById('schematicDescription').value.trim();
+    if (description.length < 30) {
+      showToast('Description must be at least 30 characters.');
+      return;
+    }
+    const anonymous = document.getElementById('schematicAnonymous').checked;
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('image', image); // <-- This line is required!
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('anonymous', anonymous);
 
-      const token = getAuthToken();
-      const res = await fetch('/api/schematics', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formData
-      });
-      const data = await res.json();
-      if (res.ok) {
-        showSchematicUploadSuccess();
-        schematicForm.reset();
-        loadSchematics();
-      } else {
-        showToast(data.error || 'Upload failed');
-      }
+    const token = getAuthToken();
+    const res = await fetch('/api/schematics', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData
     });
-  }
-  loadSchematics();
-
-  document.getElementById('schematicFile')?.addEventListener('change', function(e) {
-  const label = document.getElementById('schematicFileLabel');
-  if (label && this.files.length > 0) {
-    label.textContent = this.files[0].name;
-  } else if (label) {
-    label.textContent = 'Choose file...';
-  }
-});
+    const data = await res.json();
+    if (res.ok) {
+      showSchematicUploadSuccess();
+      schematicForm.reset();
+      loadSchematics();
+    } else {
+      showToast(data.error || 'Upload failed');
+    }
+  });
+}
   
   // Load dynamic data from API
   await Promise.all([loadCategories(), loadProducts()]);
