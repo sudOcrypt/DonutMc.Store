@@ -465,6 +465,34 @@ document.addEventListener('DOMContentLoaded', async function() {
   loadCart();
 
     // Schematic upload form event binding
+
+    const schematicImageInput = document.getElementById('schematicImage');
+  const schematicImageLabel = document.getElementById('schematicImageLabel');
+  const schematicImagePreview = document.getElementById('schematicImagePreview');
+  if (schematicImageInput) {
+    schematicImageInput.addEventListener('change', function() {
+      if (this.files.length > 0) {
+        const file = this.files[0];
+        const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif'];
+        if (!validTypes.includes(file.type)) {
+          showToast('Only PNG, JPG, JPEG, WEBP, or GIF images are allowed.');
+          this.value = '';
+          schematicImageLabel.textContent = 'Add image...';
+          schematicImagePreview.innerHTML = '';
+          return;
+        }
+        schematicImageLabel.textContent = file.name;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          schematicImagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview" style="max-width:180px;max-height:120px;border-radius:0.5rem;box-shadow:0 2px 12px #222;">`;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        schematicImageLabel.textContent = 'Add image...';
+        schematicImagePreview.innerHTML = '';
+      }
+    });
+  }
   const schematicForm = document.getElementById('schematicUploadForm');
   if (schematicForm) {
     schematicForm.addEventListener('submit', async function(e) {
@@ -1935,21 +1963,22 @@ async function loadSchematics() {
       list.innerHTML = '<div class="admin-loading">No schematics yet.</div>';
       return;
     }
-    list.innerHTML = approvedSchematics.map(s => `
-      <div class="product-card" style="position:relative;">
-        <div>
-          <h3>${escapeHtml(s.title)}</h3>
-          <p>${escapeHtml(s.description)}</p>
-          <p>By: ${s.anonymous ? 'Anonymous' : escapeHtml(s.username || 'Unknown')}</p>
-<button type="button" class="add-to-cart-btn" onclick="${loggedIn ? `downloadSchematic('${s.id}', '${s.originalname ? escapeHtml(s.originalname) : 'schematic.litematic'}')` : 'showLogin()'}">
-  ${loggedIn ? 'Download' : 'Login to Download'}
-</button>
-          ${!loggedIn ? `<div style="position:absolute;top:0;left:0;width:100%;height:100%;backdrop-filter:blur(4px);background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:2;">
-            <button class="add-to-cart-btn" onclick="showLogin()">Login to Download</button>
-          </div>` : ''}
-        </div>
-      </div>
-    `).join('');
+list.innerHTML = approvedSchematics.map(s => `
+  <div class="product-card" style="position:relative;">
+    <div>
+      ${s.image ? `<img src="/schematic-images/${s.image}" alt="Schematic Image" style="width:100%;max-width:320px;max-height:180px;object-fit:cover;border-radius:1rem;margin-bottom:1rem;box-shadow:0 2px 12px #222;">` : ''}
+      <h3>${escapeHtml(s.title)}</h3>
+      <p>${escapeHtml(s.description)}</p>
+      <p>By: ${s.anonymous ? 'Anonymous' : escapeHtml(s.username || 'Unknown')}</p>
+      <button type="button" class="add-to-cart-btn" onclick="${loggedIn ? `downloadSchematic('${s.id}', '${s.originalname ? escapeHtml(s.originalname) : 'schematic.litematic'}')` : 'showLogin()'}">
+        ${loggedIn ? 'Download' : 'Login to Download'}
+      </button>
+      ${!loggedIn ? `<div style="position:absolute;top:0;left:0;width:100%;height:100%;backdrop-filter:blur(4px);background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:2;">
+        <button class="add-to-cart-btn" onclick="showLogin()">Login to Download</button>
+      </div>` : ''}
+    </div>
+  </div>
+`).join('');
   } catch (err) {
     console.error('Failed to load schematics:', err);
   }
