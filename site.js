@@ -530,7 +530,37 @@ document.addEventListener('DOMContentLoaded', async function() {
   updateCartCount();
   renderCartPage();
 });
-
+async function downloadSchematic(schematicId, originalName = 'schematic.litematic') {
+  const token = getAuthToken();
+  if (!token) {
+    showToast('Please login to download schematics.');
+    showLogin();
+    return;
+  }
+  try {
+    const response = await fetch(`/api/schematics/${schematicId}/download`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      showToast(data.error || 'Failed to download schematic');
+      return;
+    }
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = originalName;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      window.URL.revokeObjectURL(url);
+      a.remove();
+    }, 100);
+  } catch (err) {
+    showToast('Failed to download schematic');
+  }
+}
 // ============================================
 // NAVIGATION
 // ============================================
@@ -1911,9 +1941,9 @@ async function loadSchematics() {
           <h3>${escapeHtml(s.title)}</h3>
           <p>${escapeHtml(s.description)}</p>
           <p>By: ${s.anonymous ? 'Anonymous' : escapeHtml(s.username || 'Unknown')}</p>
-          <button type="button" class="add-to-cart-btn" onclick="${loggedIn ? `window.open('/api/schematics/${s.id}/download','_blank')` : 'showLogin()'}">
-            ${loggedIn ? 'Download' : 'Login to Download'}
-          </button>
+<button type="button" class="add-to-cart-btn" onclick="${loggedIn ? `downloadSchematic('${s.id}', '${s.originalname ? escapeHtml(s.originalname) : 'schematic.litematic'}')` : 'showLogin()'}">
+  ${loggedIn ? 'Download' : 'Login to Download'}
+</button>
           ${!loggedIn ? `<div style="position:absolute;top:0;left:0;width:100%;height:100%;backdrop-filter:blur(4px);background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:2;">
             <button class="add-to-cart-btn" onclick="showLogin()">Login to Download</button>
           </div>` : ''}
