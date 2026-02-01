@@ -4,9 +4,12 @@ const fetch = require('node-fetch');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
-
 const multer = require('multer');
 const fs = require('fs');
+
+if (!fs.existsSync('schematics')) {
+  fs.mkdirSync('schematics');
+}
 
 const app = express();
 
@@ -829,32 +832,7 @@ app.get('/api/admin/stats', authenticateToken, requireAdmin, async (req, res) =>
   }
 });
 
-// Upload schematic
-app.post('/api/schematics', authenticateToken, upload.single('file'), (req, res) => {
-  const { title, description, anonymous } = req.body;
-  if (!req.file || !req.file.originalname.endsWith('.litematic')) {
-    return res.status(400).json({ error: 'Only .litematic files allowed.' });
-  }
-  if (!title || !description || description.length < 30) {
-    return res.status(400).json({ error: 'Title and thoughtful description required.' });
-  }
-  const meta = loadSchematicMeta();
-  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-  const entry = {
-    id,
-    title,
-    description,
-    filename: req.file.filename,
-    originalname: req.file.originalname,
-    username: req.user.username,
-    userId: req.user.id,
-    anonymous: anonymous === 'true',
-    createdAt: new Date().toISOString()
-  };
-  meta.push(entry);
-  saveSchematicMeta(meta);
-  res.json({ success: true, schematic: entry });
-});
+
 
 // List schematics
 app.get('/api/schematics', (req, res) => {
@@ -870,6 +848,13 @@ app.get('/api/schematics/:id/download', authenticateToken, (req, res) => {
      const filePath = path.join(__dirname, 'schematics', schematic.filename);
      res.download(filePath, schematic.originalname);
    });
+
+   app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({ error: err.message });
+  }
+  next(err);
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
