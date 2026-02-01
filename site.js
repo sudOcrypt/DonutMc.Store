@@ -3,7 +3,7 @@
 // ============================================
 
 const AUTH_CONFIG = {
-  clientId: '1386561405817454612',
+  clientId: '1467193651938459661',
   redirectUri: encodeURIComponent('http://localhost:3000/auth/callback'),
   scopes: 'identify+email+guilds.join'
 };
