@@ -267,46 +267,40 @@
                 </div>
             </div>
 
-            <!-- Schematics Page -->
-            <div id="schematics-page" class="page">
-                <div class="page-container">
-                    <div class="page-header">
-                        <svg class="page-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                        </svg>
-                        <h1 class="page-title">Upload Schematic</h1>
-                    </div>
-                    <form id="schematicUploadForm" enctype="multipart/form-data" autocomplete="off">
-                        <div class="form-group">
-                            <label for="schematicTitle" class="form-label">Title</label>
-                            <input type="text" id="schematicTitle" class="form-input" required maxlength="64" placeholder="e.g., Mega Base Schematic">
-                        </div>
-                        <div class="form-group">
-                            <label for="schematicDescription" class="form-label">Description</label>
-                            <textarea id="schematicDescription" class="form-input" required minlength="30" maxlength="500" placeholder="Describe your schematic in detail..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="schematicFile" class="form-label">.litematic File</label>
-                            <div class="custom-file-input-wrapper">
-                                <input type="file" id="schematicFile" class="custom-file-input" accept=".litematic" required>
-                                <label for="schematicFile" id="schematicFileLabel" class="custom-file-label">Choose file...</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="custom-checkbox">
-                                <input type="checkbox" id="schematicAnonymous">
-                                <span class="checkmark"></span>
-                                Submit anonymously
-                            </label>
-                        </div>
-                        <button type="submit" class="form-submit-btn">Upload Schematic</button>
-                    </form>
-                    <div id="schematicUploadMessage"></div>
-                    <hr style="margin:2rem 0;">
-                    <h2 class="section-title">Community Schematics</h2>
-                    <div id="schematicsList"></div>
+            <!-- Schematic Upload Form (replace the form in #schematics-page) -->
+            <form id="schematicUploadForm" enctype="multipart/form-data" autocomplete="off">
+                <div class="form-group">
+                    <label for="schematicTitle" class="form-label">Title</label>
+                    <input type="text" id="schematicTitle" class="form-input" required maxlength="64" placeholder="e.g., Mega Base Schematic">
                 </div>
-            </div>
+                <div class="form-group">
+                    <label for="schematicDescription" class="form-label">Description</label>
+                    <textarea id="schematicDescription" class="form-input" required minlength="30" maxlength="500" placeholder="Describe your schematic in detail..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="schematicFile" class="form-label">.litematic File</label>
+                    <div class="custom-file-input-wrapper">
+                        <input type="file" id="schematicFile" class="custom-file-input" accept=".litematic" required>
+                        <label for="schematicFile" id="schematicFileLabel" class="custom-file-label">Choose file...</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="schematicImage" class="form-label">Schematic Image</label>
+                    <div class="custom-file-input-wrapper">
+                        <input type="file" id="schematicImage" class="custom-file-input" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" required>
+                        <label for="schematicImage" id="schematicImageLabel" class="custom-file-label">Add image...</label>
+                    </div>
+                    <div id="schematicImagePreview" style="margin-top:0.5rem;"></div>
+                </div>
+                <div class="form-group">
+                    <label class="custom-checkbox">
+                        <input type="checkbox" id="schematicAnonymous">
+                        <span class="checkmark"></span>
+                        Submit anonymously
+                    </label>
+                </div>
+                <button type="submit" class="form-submit-btn">Upload Schematic</button>
+            </form>
 
             <!-- Admin Page -->
             <div id="admin-page" class="page">
@@ -444,7 +438,7 @@
                     </div>
                 </div>
             </div>
-            
+
 
             <!-- Sell to Us Page -->
             <div id="sell-to-us-page" class="page">
