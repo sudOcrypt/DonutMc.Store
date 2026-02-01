@@ -11,6 +11,18 @@ if (!fs.existsSync('schematics')) {
   fs.mkdirSync('schematics');
 }
 
+function loadSchematicMeta() {
+  try {
+    return JSON.parse(fs.readFileSync('schematics/meta.json', 'utf8'));
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveSchematicMeta(meta) {
+  fs.writeFileSync('schematics/meta.json', JSON.stringify(meta, null, 2));
+}
+
 const app = express();
 
 // ============================================
@@ -54,6 +66,9 @@ app.post('/api/schematics', authenticateToken, upload.fields([
   { name: 'file', maxCount: 1 },
   { name: 'image', maxCount: 1 }
 ]), (req, res) => {
+  console.log('BODY:', req.body);
+  console.log('FILES:', req.files);
+
   const { title, description, anonymous } = req.body;
   const file = req.files?.file?.[0];
   const image = req.files?.image?.[0];
@@ -854,6 +869,11 @@ app.get('/api/schematics/:id/download', authenticateToken, (req, res) => {
     return res.status(400).json({ error: err.message });
   }
   next(err);
+});
+
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
 const PORT = process.env.PORT || 3000;
