@@ -31,17 +31,64 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-const upload = multer({ dest: 'schematics/' });
-   const schematicMetaFile = path.join(__dirname, 'schematics.json');
+// Multer config for schematic and image
+const upload = multer({
+  dest: 'schematics/',
+  fileFilter: (req, file, cb) => {
+    if (file.fieldname === 'file') {
+      return cb(null, file.originalname.endsWith('.litematic'));
+    }
+    if (file.fieldname === 'image') {
+      const allowed = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif'];
+      return cb(null, allowed.includes(file.mimetype));
+    }
+    cb(null, false);
+  }
+});
 
-   // Helper to load/save schematic metadata
-   function loadSchematicMeta() {
-     if (!fs.existsSync(schematicMetaFile)) return [];
-     return JSON.parse(fs.readFileSync(schematicMetaFile, 'utf8'));
-   }
-   function saveSchematicMeta(meta) {
-     fs.writeFileSync(schematicMetaFile, JSON.stringify(meta, null, 2));
-   }
+// Upload schematic (with image)
+app.post('/api/schematics', authenticateToken, upload.fields([
+  { name: 'file', maxCount: 1 },
+  { name: 'image', maxCount: 1 }
+]), (req, res) => {
+  const { title, description, anonymous } = req.body;
+  const file = req.files?.file?.[0];
+  const image = req.files?.image?.[0];
+  if (!file || !file.originalname.endsWith('.litematic')) {
+    return res.status(400).json({ error: 'Only .litematic files allowed.' });
+  }
+  if (!image) {
+    return res.status(400).json({ error: 'Image is required.' });
+  }
+  const allowed = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif'];
+  if (!allowed.includes(image.mimetype)) {
+    return res.status(400).json({ error: 'Invalid image type.' });
+  }
+  if (!title || !description || description.length < 30) {
+    return res.status(400).json({ error: 'Title and thoughtful description required.' });
+  }
+  const meta = loadSchematicMeta();
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const entry = {
+    id,
+    title,
+    description,
+    filename: file.filename,
+    originalname: file.originalname,
+    image: image.filename,
+    imageOriginal: image.originalname,
+    username: req.user.username,
+    userId: req.user.id,
+    anonymous: anonymous === 'true',
+    createdAt: new Date().toISOString()
+  };
+  meta.push(entry);
+  saveSchematicMeta(meta);
+  res.json({ success: true, schematic: entry });
+});
+
+// Serve schematic images
+app.use('/schematic-images', express.static(path.join(__dirname, 'schematics')));
 
 // ============================================
 // HELPER FUNCTIONS
