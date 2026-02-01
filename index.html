@@ -116,6 +116,52 @@
                         </button>
                     </div>
                 </section>
+                <div id="schematics-page" class="page">
+                    <div class="page-container">
+                        <div class="page-header">
+                            <svg class="page-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                            <h1 class="page-title">Upload Schematic</h1>
+                        </div>
+                        <form id="schematicUploadForm" enctype="multipart/form-data" autocomplete="off">
+                            <div class="form-group">
+                                <label for="schematicTitle" class="form-label">Title</label>
+                                <input type="text" id="schematicTitle" class="form-input" required maxlength="64" placeholder="e.g., Mega Base Schematic">
+                            </div>
+                            <div class="form-group">
+                                <label for="schematicDescription" class="form-label">Description</label>
+                                <textarea id="schematicDescription" class="form-input" required minlength="30" maxlength="500" placeholder="Describe your schematic in detail..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="schematicFile" class="form-label">.litematic File</label>
+                                <div class="custom-file-input-wrapper">
+                                    <input type="file" id="schematicFile" class="custom-file-input" accept=".litematic" required>
+                                    <label for="schematicFile" id="schematicFileLabel" class="custom-file-label">Choose file...</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="schematicImage" class="form-label">Schematic Image</label>
+                                <div class="custom-file-input-wrapper">
+                                    <input type="file" id="schematicImage" class="custom-file-input" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" required>
+                                    <label for="schematicImage" id="schematicImageLabel" class="custom-file-label">Add image...</label>
+                                </div>
+                                <div id="schematicImagePreview" style="margin-top:0.5rem;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" id="schematicAnonymous">
+                                    <span class="checkmark"></span>
+                                    Submit anonymously
+                                </label>
+                            </div>
+                            <button type="submit" class="form-submit-btn">Upload Schematic</button>
+                        </form>
+                        <hr style="margin:2rem 0;">
+                        <h2 class="section-title">Community Schematics</h2>
+                        <div id="schematicsList"></div>
+                    </div>
+                </div>
 
                 <!-- FAQ -->
                 <section class="faq-section">
@@ -222,269 +268,235 @@
                 </footer>
             </div>
 
-            <!-- Cart Page -->
-            <div id="cart-page" class="page">
-                <div class="page-container">
-                    <div class="page-header">
-                        <svg class="page-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <circle cx="8" cy="21" r="1"></circle>
-                            <circle cx="19" cy="21" r="1"></circle>
-                            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
-                        </svg>
-                        <h1 class="page-title">Shopping Cart</h1>
-                    </div>
-
-                    <div class="cart-items" id="cartItems"></div>
-
-                    <div class="cart-total">
-                        <div class="cart-total-header">
-                            <span class="cart-total-label">Total</span>
-                            <span class="cart-total-amount">$0.00</span>
-                        </div>
-                        <button type="button" class="checkout-btn" onclick="proceedToCheckout()">Proceed to Checkout</button>
-                        <button type="button" class="clear-cart-btn" onclick="clearCart()">Clear Cart</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Free Money Page -->
-            <div id="free-money-page" class="page">
-                <div class="page-container">
-                    <h1 class="page-title">💰 Free Money</h1>
-                    <p class="page-subtitle">Earn rewards by completing tasks</p>
-                    <div class="free-money-content">
-                        <p class="coming-soon">Coming Soon!</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Reviews Page -->
-            <div id="reviews-page" class="page">
-                <div class="page-container">
-                    <h1 class="page-title">Customer Reviews</h1>
-                    <p class="page-subtitle">See what our customers are saying</p>
-                    <div class="reviews-list" id="reviewsList"></div>
-                </div>
-            </div>
-
-            <!-- Schematic Upload Form (replace the form in #schematics-page) -->
-            <form id="schematicUploadForm" enctype="multipart/form-data" autocomplete="off">
-                <div class="form-group">
-                    <label for="schematicTitle" class="form-label">Title</label>
-                    <input type="text" id="schematicTitle" class="form-input" required maxlength="64" placeholder="e.g., Mega Base Schematic">
-                </div>
-                <div class="form-group">
-                    <label for="schematicDescription" class="form-label">Description</label>
-                    <textarea id="schematicDescription" class="form-input" required minlength="30" maxlength="500" placeholder="Describe your schematic in detail..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="schematicFile" class="form-label">.litematic File</label>
-                    <div class="custom-file-input-wrapper">
-                        <input type="file" id="schematicFile" class="custom-file-input" accept=".litematic" required>
-                        <label for="schematicFile" id="schematicFileLabel" class="custom-file-label">Choose file...</label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="schematicImage" class="form-label">Schematic Image</label>
-                    <div class="custom-file-input-wrapper">
-                        <input type="file" id="schematicImage" class="custom-file-input" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" required>
-                        <label for="schematicImage" id="schematicImageLabel" class="custom-file-label">Add image...</label>
-                    </div>
-                    <div id="schematicImagePreview" style="margin-top:0.5rem;"></div>
-                </div>
-                <div class="form-group">
-                    <label class="custom-checkbox">
-                        <input type="checkbox" id="schematicAnonymous">
-                        <span class="checkmark"></span>
-                        Submit anonymously
-                    </label>
-                </div>
-                <button type="submit" class="form-submit-btn">Upload Schematic</button>
-            </form>
-
-            <!-- Admin Page -->
-            <div id="admin-page" class="page">
-                <div class="admin-container">
-                    <div class="admin-header">
-                        <h1 class="admin-title">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                            </svg>
-                            Admin Dashboard
-                        </h1>
-                        <div class="admin-tabs">
-                            <button type="button" class="admin-tab active" onclick="switchAdminTab('orders')">Orders</button>
-                            <button type="button" class="admin-tab" onclick="switchAdminTab('products')">Products</button>
-                            <button type="button" class="admin-tab" onclick="switchAdminTab('logins')">Login Logs</button>
-                            <button type="button" class="admin-tab" onclick="switchAdminTab('schematics')">Schematics</button>
-                        </div>
-                    </div>
-
-                    <div class="admin-stats" id="adminStats">
-                        <div class="stat-card">
-                            <div class="stat-icon">📦</div>
-                            <div class="stat-value" id="statTotal">-</div>
-                            <div class="stat-label">Total Orders</div>
-                        </div>
-                        <div class="stat-card stat-pending">
-                            <div class="stat-icon">🟡</div>
-                            <div class="stat-value" id="statPending">-</div>
-                            <div class="stat-label">Pending</div>
-                        </div>
-                        <div class="stat-card stat-processing">
-                            <div class="stat-icon">🔵</div>
-                            <div class="stat-value" id="statProcessing">-</div>
-                            <div class="stat-label">Processing</div>
-                        </div>
-                        <div class="stat-card stat-completed">
-                            <div class="stat-icon">🟢</div>
-                            <div class="stat-value" id="statCompleted">-</div>
-                            <div class="stat-label">Completed</div>
-                        </div>
-                        <div class="stat-card stat-revenue">
-                            <div class="stat-icon">💰</div>
-                            <div class="stat-value" id="statRevenue">-</div>
-                            <div class="stat-label">Revenue</div>
-                        </div>
-                    </div>
-
-                    <!-- Orders Tab -->
-                    <div class="admin-tab-content active" id="ordersTab">
-                        <div class="admin-filters">
-                            <input type="text" id="adminSearch" class="admin-search" placeholder="Search orders by ID, username...">
-                            <select id="adminStatusFilter" class="admin-select">
-                                <option value="all">All Statuses</option>
-                                <option value="pending">Pending</option>
-                                <option value="processing">Processing</option>
-                                <option value="completed">Completed</option>
-                                <option value="cancelled">Cancelled</option>
-                            </select>
-                            <button type="button" class="admin-refresh-btn" onclick="loadAdminOrders()">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
-                                    <path d="M21 3v5h-5"></path>
+                    <!-- Cart Page -->
+                    <div id="cart-page" class="page">
+                        <div class="page-container">
+                            <div class="page-header">
+                                <svg class="page-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <circle cx="8" cy="21" r="1"></circle>
+                                    <circle cx="19" cy="21" r="1"></circle>
+                                    <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
                                 </svg>
-                                Refresh
-                            </button>
-                        </div>
-                        <div class="admin-orders" id="adminOrders">
-                            <div class="admin-loading">Loading orders...</div>
+                                <h1 class="page-title">Shopping Cart</h1>
+                            </div>
+
+                            <div class="cart-items" id="cartItems"></div>
+
+                            <div class="cart-total">
+                                <div class="cart-total-header">
+                                    <span class="cart-total-label">Total</span>
+                                    <span class="cart-total-amount">$0.00</span>
+                                </div>
+                                <button type="button" class="checkout-btn" onclick="proceedToCheckout()">Proceed to Checkout</button>
+                                <button type="button" class="clear-cart-btn" onclick="clearCart()">Clear Cart</button>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Products Tab -->
-                    <div class="admin-tab-content" id="productsTab">
-                        <div class="admin-filters">
-                            <input type="text" id="productSearch" class="admin-search" placeholder="Search products...">
-                            <select id="productCategoryFilter" class="admin-select">
-                                <option value="all">All Categories</option>
-                                <option value="Money">Money</option>
-                                <option value="Items">Items</option>
-                                <option value="Bases">Bases</option>
-                            </select>
-                            <button type="button" class="admin-add-btn" onclick="showAddProductModal()">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 5v14M5 12h14"></path>
+                    <!-- Free Money Page -->
+                    <div id="free-money-page" class="page">
+                        <div class="page-container">
+                            <h1 class="page-title">💰 Free Money</h1>
+                            <p class="page-subtitle">Earn rewards by completing tasks</p>
+                            <div class="free-money-content">
+                                <p class="coming-soon">Coming Soon!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reviews Page -->
+                    <div id="reviews-page" class="page">
+                        <div class="page-container">
+                            <h1 class="page-title">Customer Reviews</h1>
+                            <p class="page-subtitle">See what our customers are saying</p>
+                            <div class="reviews-list" id="reviewsList"></div>
+                        </div>
+                    </div>
+
+
+                    <!-- Admin Page -->
+                    <div id="admin-page" class="page">
+                        <div class="admin-container">
+                            <div class="admin-header">
+                                <h1 class="admin-title">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                    </svg>
+                                    Admin Dashboard
+                                </h1>
+                                <div class="admin-tabs">
+                                    <button type="button" class="admin-tab active" onclick="switchAdminTab('orders')">Orders</button>
+                                    <button type="button" class="admin-tab" onclick="switchAdminTab('products')">Products</button>
+                                    <button type="button" class="admin-tab" onclick="switchAdminTab('logins')">Login Logs</button>
+                                    <button type="button" class="admin-tab" onclick="switchAdminTab('schematics')">Schematics</button>
+                                </div>
+                            </div>
+
+                            <div class="admin-stats" id="adminStats">
+                                <div class="stat-card">
+                                    <div class="stat-icon">📦</div>
+                                    <div class="stat-value" id="statTotal">-</div>
+                                    <div class="stat-label">Total Orders</div>
+                                </div>
+                                <div class="stat-card stat-pending">
+                                    <div class="stat-icon">🟡</div>
+                                    <div class="stat-value" id="statPending">-</div>
+                                    <div class="stat-label">Pending</div>
+                                </div>
+                                <div class="stat-card stat-processing">
+                                    <div class="stat-icon">🔵</div>
+                                    <div class="stat-value" id="statProcessing">-</div>
+                                    <div class="stat-label">Processing</div>
+                                </div>
+                                <div class="stat-card stat-completed">
+                                    <div class="stat-icon">🟢</div>
+                                    <div class="stat-value" id="statCompleted">-</div>
+                                    <div class="stat-label">Completed</div>
+                                </div>
+                                <div class="stat-card stat-revenue">
+                                    <div class="stat-icon">💰</div>
+                                    <div class="stat-value" id="statRevenue">-</div>
+                                    <div class="stat-label">Revenue</div>
+                                </div>
+                            </div>
+
+                            <!-- Orders Tab -->
+                            <div class="admin-tab-content active" id="ordersTab">
+                                <div class="admin-filters">
+                                    <input type="text" id="adminSearch" class="admin-search" placeholder="Search orders by ID, username...">
+                                    <select id="adminStatusFilter" class="admin-select">
+                                        <option value="all">All Statuses</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="processing">Processing</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                    <button type="button" class="admin-refresh-btn" onclick="loadAdminOrders()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
+                                            <path d="M21 3v5h-5"></path>
+                                        </svg>
+                                        Refresh
+                                    </button>
+                                </div>
+                                <div class="admin-orders" id="adminOrders">
+                                    <div class="admin-loading">Loading orders...</div>
+                                </div>
+                            </div>
+
+                            <!-- Products Tab -->
+                            <div class="admin-tab-content" id="productsTab">
+                                <div class="admin-filters">
+                                    <input type="text" id="productSearch" class="admin-search" placeholder="Search products...">
+                                    <select id="productCategoryFilter" class="admin-select">
+                                        <option value="all">All Categories</option>
+                                        <option value="Money">Money</option>
+                                        <option value="Items">Items</option>
+                                        <option value="Bases">Bases</option>
+                                    </select>
+                                    <button type="button" class="admin-add-btn" onclick="showAddProductModal()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M12 5v14M5 12h14"></path>
+                                        </svg>
+                                        Add Product
+                                    </button>
+                                    <button type="button" class="admin-refresh-btn" onclick="loadAdminProducts()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
+                                            <path d="M21 3v5h-5"></path>
+                                        </svg>
+                                        Refresh
+                                    </button>
+                                </div>
+                                <div class="admin-products" id="adminProducts">
+                                    <div class="admin-loading">Loading products...</div>
+                                </div>
+                            </div>
+                            <div class="admin-tab-content" id="loginsTab">
+                                <div class="admin-filters">
+                                    <button type="button" class="admin-refresh-btn" onclick="loadLoginLogs()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
+                                            <path d="M21 3v5h-5"></path>
+                                        </svg>
+                                        Refresh
+                                    </button>
+                                </div>
+                                <div class="admin-login-logs" id="adminLoginLogs">
+                                    <div class="admin-loading">Loading login logs...</div>
+                                </div>
+                            </div>
+
+                            <div class="admin-tab-content" id="schematicsTab">
+                                <div class="admin-filters">
+                                    <button type="button" class="admin-refresh-btn" onclick="loadAdminSchematics()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
+                                            <path d="M21 3v5h-5"></path>
+                                        </svg>
+                                        Refresh
+                                    </button>
+                                    <button type="button" class="admin-add-btn" onclick="showAdminSchematicModal()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M12 5v14M5 12h14"></path>
+                                        </svg>
+                                        Post Schematic
+                                    </button>
+                                </div>
+                                <h3>Pending Schematics</h3>
+                                <div id="adminSchematicsPending"></div>
+                                <h3>Uploaded Schematics</h3>
+                                <div id="adminSchematicsUploaded"></div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Sell to Us Page -->
+                    <div id="sell-to-us-page" class="page">
+                        <div class="page-container">
+                            <div class="page-header" style="justify-content: center;">
+                                <svg class="page-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                                 </svg>
-                                Add Product
-                            </button>
-                            <button type="button" class="admin-refresh-btn" onclick="loadAdminProducts()">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
-                                    <path d="M21 3v5h-5"></path>
-                                </svg>
-                                Refresh
-                            </button>
-                        </div>
-                        <div class="admin-products" id="adminProducts">
-                            <div class="admin-loading">Loading products...</div>
-                        </div>
-                    </div>
-                    <div class="admin-tab-content" id="loginsTab">
-                        <div class="admin-filters">
-                            <button type="button" class="admin-refresh-btn" onclick="loadLoginLogs()">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
-                                    <path d="M21 3v5h-5"></path>
-                                </svg>
-                                Refresh
-                            </button>
-                        </div>
-                        <div class="admin-login-logs" id="adminLoginLogs">
-                            <div class="admin-loading">Loading login logs...</div>
-                        </div>
-                    </div>
+                                <h1 class="page-title">Sell to Us</h1>
+                            </div>
+                            <p class="page-subtitle">Turn your DonutSMP items into real cash</p>
 
-                    <div class="admin-tab-content" id="schematicsTab">
-                        <div class="admin-filters">
-                            <button type="button" class="admin-refresh-btn" onclick="loadAdminSchematics()">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
-                                    <path d="M21 3v5h-5"></path>
-                                </svg>
-                                Refresh
-                            </button>
-                            <button type="button" class="admin-add-btn" onclick="showAdminSchematicModal()">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 5v14M5 12h14"></path>
-                                </svg>
-                                Post Schematic
-                            </button>
-                        </div>
-                        <h3>Pending Schematics</h3>
-                        <div id="adminSchematicsPending"></div>
-                        <h3>Uploaded Schematics</h3>
-                        <div id="adminSchematicsUploaded"></div>
-                    </div>
-                </div>
-            </div>
+                            <div class="sell-info-grid">
+                                <div class="sell-card">
+                                    <div class="sell-card-icon">💰</div>
+                                    <h3>We Buy Coins</h3>
+                                    <p>Selling DonutSMP coins? We offer competitive rates with instant payment.</p>
+                                    <div class="sell-rate">$0.12/M</div>
+                                </div>
+                                <div class="sell-card">
+                                    <div class="sell-card-icon">📦</div>
+                                    <h3>We Buy Items</h3>
+                                    <p>Elytras, spawners, rare items - we buy it all at fair prices.</p>
+                                    <div class="sell-rate">Best Rates</div>
+                                </div>
+                                <div class="sell-card">
+                                    <div class="sell-card-icon">🏠</div>
+                                    <h3>We Buy Bases</h3>
+                                    <p>Looking to cash out your base? We'll make you an offer.</p>
+                                    <div class="sell-rate">Custom Quote</div>
+                                </div>
+                            </div>
 
-
-            <!-- Sell to Us Page -->
-            <div id="sell-to-us-page" class="page">
-                <div class="page-container">
-                    <div class="page-header" style="justify-content: center;">
-                        <svg class="page-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                        </svg>
-                        <h1 class="page-title">Sell to Us</h1>
-                    </div>
-                    <p class="page-subtitle">Turn your DonutSMP items into real cash</p>
-
-                    <div class="sell-info-grid">
-                        <div class="sell-card">
-                            <div class="sell-card-icon">💰</div>
-                            <h3>We Buy Coins</h3>
-                            <p>Selling DonutSMP coins? We offer competitive rates with instant payment.</p>
-                            <div class="sell-rate">$0.12/M</div>
-                        </div>
-                        <div class="sell-card">
-                            <div class="sell-card-icon">📦</div>
-                            <h3>We Buy Items</h3>
-                            <p>Elytras, spawners, rare items - we buy it all at fair prices.</p>
-                            <div class="sell-rate">Best Rates</div>
-                        </div>
-                        <div class="sell-card">
-                            <div class="sell-card-icon">🏠</div>
-                            <h3>We Buy Bases</h3>
-                            <p>Looking to cash out your base? We'll make you an offer.</p>
-                            <div class="sell-rate">Custom Quote</div>
+                            <div class="sell-cta">
+                                <h3>Ready to Sell?</h3>
+                                <p>Join our Discord and open a ticket to get started</p>
+                                <a href="https://discord.gg/5GdyQdhc4H" target="_blank" rel="noopener noreferrer" class="sell-discord-btn">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z" />
+                                    </svg>
+                                    Open a Sell Ticket
+                                </a>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="sell-cta">
-                        <h3>Ready to Sell?</h3>
-                        <p>Join our Discord and open a ticket to get started</p>
-                        <a href="https://discord.gg/5GdyQdhc4H" target="_blank" rel="noopener noreferrer" class="sell-discord-btn">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z" />
-                            </svg>
-                            Open a Sell Ticket
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </main>
+</main>
     </div>
 
     <!-- Floating Discord Button -->
