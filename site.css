@@ -3259,10 +3259,30 @@ a:focus-visible {
     flex-direction: column;
     gap: 0.5rem;
 }
-/* Add spacing below the last form-group before the submit button */
-#schematicUploadForm .form-group:last-of-type {
-    margin-bottom: 1.5rem;
+/* Limit schematic upload form width */
+#schematicUploadForm {
+    max-width: 480px;
+    margin: 0 auto;
 }
+
+    /* Make file labels and submit button not stretch full width */
+    #schematicUploadForm .custom-file-label,
+    #schematicUploadForm .form-submit-btn {
+        width: auto;
+        min-width: 180px;
+        max-width: 100%;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Optional: If you want the button to fill the form width, keep width: 100% but reduce border-radius */
+    #schematicUploadForm .form-submit-btn {
+        width: 100%;
+        border-radius: 0.75rem;
+    }
 
 .form-label {
     color: white;
